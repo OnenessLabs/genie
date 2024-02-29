@@ -2,14 +2,18 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"sort"
 
 	"github.com/OnenessLabs/genie/internal/debug"
 	"github.com/OnenessLabs/genie/internal/flags"
+	"github.com/OnenessLabs/genie/rpc"
 	"github.com/ethereum/go-ethereum/console/prompt"
 	"github.com/urfave/cli/v2"
 	"go.uber.org/automaxprocs/maxprocs"
+	"go.uber.org/fx"
+	"google.golang.org/grpc"
 )
 
 const ENV_VARS_PREFIX = "GENIE"
@@ -23,11 +27,14 @@ func init() {
 			return fmt.Errorf("invalid command: %q", args[0])
 		}
 
-		// start services here, e.g.
-		// someService := SomeService.New()
-		// defer someService.Shutdown()
-		// someService.Start()
-		// someService.Wait()
+		fxApp := fx.New(
+			fx.Provide(rpc.NewHTTPServer),
+			fx.Provide(rpc.NewGRPCServer),
+			fx.Invoke(func(*grpc.Server) {}),
+			fx.Invoke(func(*http.Server) {}),
+		)
+
+		fxApp.Run()
 
 		return nil
 	}
