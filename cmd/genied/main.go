@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/OnenessLabs/genie/dkg"
 	"net/http"
 	"os"
 	"sort"
@@ -30,6 +31,7 @@ func init() {
 		fxApp := fx.New(
 			fx.Provide(rpc.NewHTTPServer),
 			fx.Provide(rpc.NewGRPCServer),
+			fx.Provide(dkg.NewDKGServer),
 			fx.Invoke(func(*grpc.Server) {}),
 			fx.Invoke(func(*http.Server) {}),
 		)
