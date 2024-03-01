@@ -49,6 +49,8 @@ func NewDKGServer(lc fx.Lifecycle) *Node {
 
 	var cLogger *logger.Logger
 	cLogger = loggerRoot.Named("App")
+	ParamsPeering.PeeringURL = "0.0.0.0:4000"
+	ParamsPeering.Port = 4000
 	netImpl, tnmImpl, err := lpp.NewNetworkProvider(
 		ParamsPeering.PeeringURL,
 		ParamsPeering.Port,
