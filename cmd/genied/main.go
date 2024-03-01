@@ -34,6 +34,7 @@ func init() {
 			fx.Provide(dkg.NewDKGServer),
 			fx.Invoke(func(*grpc.Server) {}),
 			fx.Invoke(func(*http.Server) {}),
+			fx.Invoke(func(*dkg.Node) {}),
 		)
 
 		fxApp.Run()

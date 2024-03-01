@@ -82,7 +82,7 @@ func NewDKGServer(lc fx.Lifecycle) *Node {
 	)
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			fmt.Println("Starting DKG node server at :9090")
+			fmt.Println("Starting DKG node server at ")
 
 			return nil
 		},
