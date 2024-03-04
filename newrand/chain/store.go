@@ -48,9 +48,6 @@ const (
 	// BoltDB uses the BoltDB engine for storing data
 	BoltDB StorageType = "bolt"
 
-	// PostgreSQL uses the PostgreSQL database for storing data
-	PostgreSQL StorageType = "postgres"
-
 	// MemDB uses the in-memory database to store data
 	MemDB StorageType = "memdb"
 )
@@ -67,8 +64,6 @@ func MetricsStorageType(st StorageType) int {
 	switch st {
 	case BoltDB:
 		return boltDBMetrics
-	case PostgreSQL:
-		return postgreSQLMetrics
 	case MemDB:
 		return memDBMetrics
 	default:

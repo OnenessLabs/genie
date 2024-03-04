@@ -351,21 +351,6 @@ var storageTypeFlag = &cli.StringFlag{
 	EnvVars: []string{"DRAND_DB"},
 }
 
-var pgDSNFlag = &cli.StringFlag{
-	Name: "pg-dsn",
-	Usage: "PostgreSQL DSN configuration.\n" +
-		"Supported options are:\n" +
-		//nolint:lll
-		"- sslmode: if the SSL connection is disabled or required. Default disabled. See: https://www.postgresql.org/docs/15/libpq-ssl.html#LIBPQ-SSL-PROTECTION\n" +
-		//nolint:lll
-		"- connect_timeout: how many seconds before the connection attempt times out. Default 5 (seconds). See: https://www.postgresql.org/docs/15/libpq-connect.html#LIBPQ-CONNECT-CONNECT-TIMEOUT\n" +
-		"- max-idle: number of maximum idle connections. Default: 2\n" +
-		"- max-open: number of maximum open connections. Default: 0 - unlimited.\n",
-
-	Value:   "postgres://drand:drand@localhost:5432/drand?sslmode=disable&connect_timeout=5",
-	EnvVars: []string{"DRAND_PG_DSN"},
-}
-
 var memDBSizeFlag = &cli.IntFlag{
 	Name:    "memdb-size",
 	Usage:   "The buffer size for in-memory storage. Must be at least 10. Recommended, 2000 or more",
@@ -1087,13 +1072,6 @@ func contextToConfig(c *cli.Context) *core.Config {
 	switch chain.StorageType(c.String(storageTypeFlag.Name)) {
 	case chain.BoltDB:
 		opts = append(opts, core.WithDBStorageEngine(chain.BoltDB))
-	case chain.PostgreSQL:
-		opts = append(opts, core.WithDBStorageEngine(chain.PostgreSQL))
-
-		if c.IsSet(pgDSNFlag.Name) {
-			pgdsn := c.String(pgDSNFlag.Name)
-			opts = append(opts, core.WithPgDSN(pgdsn))
-		}
 	case chain.MemDB:
 		opts = append(opts,
 			core.WithDBStorageEngine(chain.MemDB),

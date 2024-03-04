@@ -1,7 +1,6 @@
 package core
 
 import (
-	"context"
 	"fmt"
 	"path"
 	"time"
@@ -12,7 +11,6 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/OnenessLabs/genie/newrand/chain"
-	"github.com/OnenessLabs/genie/newrand/chain/postgresdb/database"
 	"github.com/OnenessLabs/genie/newrand/common"
 	"github.com/OnenessLabs/genie/newrand/key"
 	"github.com/OnenessLabs/genie/newrand/log"
@@ -164,39 +162,6 @@ func WithDBStorageEngine(engine chain.StorageType) ConfigOption {
 	return func(d *Config) {
 		d.dbStorageEngine = engine
 	}
-}
-
-// WithPgDSN applies PosgresSQL specific options to the PG store.
-// It will also create a new database connection.
-func WithPgDSN(dsn string) ConfigOption {
-	return func(d *Config) {
-		d.pgDSN = dsn
-
-		if d.dbStorageEngine != chain.PostgreSQL {
-			// TODO (dlsniper): Would be nice to have a log here. It needs to be injected somehow.
-			return
-		}
-
-		pgConf, err := database.ConfigFromDSN(dsn)
-		if err != nil {
-			panic(err)
-		}
-
-		//nolint:gomnd // We want a reasonable timeout to connect to the database. If it's not done in 5 seconds, then there are bigger problems.
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-
-		d.pgConn, err = database.Open(ctx, pgConf)
-		if err != nil {
-			err := fmt.Errorf("error while attempting to connect to the database: dsn: %s %w", dsn, err)
-			panic(err)
-		}
-	}
-}
-
-// PgDSN returns the PostgreSQL specific DSN configuration.
-func (d *Config) PgDSN() string {
-	return d.pgDSN
 }
 
 func WithMemDBSize(bufferSize int) ConfigOption {
