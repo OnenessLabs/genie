@@ -36,11 +36,12 @@ type Node struct {
 	blsSuite                Suite                                     // Cryptography to use for the Pairing based operations.
 	edSuite                 suites.Suite                              // Cryptography to use for the Ed25519 based operations.
 	netProvider             peering.NetworkProvider                   // Network to communicate through.
-	dkShareRegistryProvider registry.DKShareRegistryProvider          // Where to store the generated keys.
+	DkShareRegistryProvider registry.DKShareRegistryProvider          // Where to store the generated keys.
 	processes               *shrinkingmap.ShrinkingMap[string, *proc] // Only for introspection.
 	procLock                *sync.RWMutex                             // To guard access to the process pool.
 	initMsgQueue            chan *initiatorInitMsgIn                  // Incoming events processed async.
-	cleanupFunc             context.CancelFunc                        // Peering cleanup func
+	TrustedNetworkManager   peering.TrustedNetworkManager
+	cleanupFunc             context.CancelFunc // Peering cleanup func
 	log                     *logger.Logger
 }
 
@@ -63,7 +64,7 @@ func NewNode(
 		blsSuite:                tcrypto.DefaultBLSSuite(),
 		edSuite:                 edwards25519.NewBlakeSHA256Ed25519(),
 		netProvider:             netProvider,
-		dkShareRegistryProvider: dkShareRegistryProvider,
+		DkShareRegistryProvider: dkShareRegistryProvider,
 		processes:               shrinkingmap.New[string, *proc](),
 		procLock:                &sync.RWMutex{},
 		initMsgQueue:            make(chan *initiatorInitMsgIn),
@@ -110,7 +111,7 @@ func (n *Node) GenerateDistributedKey(
 	stepRetry time.Duration, // Retry for Initiator -> Peer communication.
 	timeout time.Duration, // Timeout for the entire procedure.
 ) (tcrypto.DKShare, error) {
-	//n.log.Infof("Starting new DKG procedure, initiator=%v, peers=%+v", n.netProvider.Self().PeeringURL(), peerPubs)
+	n.log.Infof("Starting new DKG procedure, initiator=%v, peers=%+v", n.netProvider.Self().PeeringURL(), peerPubs)
 	var err error
 	peerCount := uint16(len(peerPubs))
 	//

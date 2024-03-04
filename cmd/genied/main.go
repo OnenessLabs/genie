@@ -2,7 +2,10 @@ package main
 
 import (
 	"fmt"
+	"github.com/OnenessLabs/genie/config"
 	"github.com/OnenessLabs/genie/dkg"
+	"github.com/OnenessLabs/genie/rpc/http_server"
+	"github.com/iotaledger/hive.go/logger"
 	"net/http"
 	"os"
 	"sort"
@@ -21,6 +24,26 @@ const ENV_VARS_PREFIX = "GENIE"
 
 var app = flags.NewApp("the Oneness network node daemon")
 
+// ProvideLogger to fx
+//func ProvideLogger() *zap.SugaredLogger {
+//	logger, _ := zap.NewProduction()
+//	slogger := logger.Sugar()
+//
+//	return slogger
+//}
+
+func ProvideLogger() *logger.Logger {
+	loggerParams := &logger.Config{OutputPaths: []string{"./s.log"}}
+	loggerRoot, err := logger.NewRootLogger(*loggerParams)
+	if err != nil {
+		panic(err)
+	}
+
+	var cLogger *logger.Logger
+	cLogger = loggerRoot.Named("App")
+	return cLogger
+}
+
 func init() {
 	// Initialize the CLI app and start
 	app.Action = func(ctx *cli.Context) error {
@@ -29,11 +52,17 @@ func init() {
 		}
 
 		fxApp := fx.New(
-			fx.Provide(rpc.NewHTTPServer),
+			fx.Provide(config.ProvideConfig),
+			fx.Provide(ProvideLogger),
+			fx.Provide(http.NewServeMux),
+			fx.Provide(dkg.NodeIdentityRegistry),
+
+			//fx.Provide(rpc.NewHTTPServer),
 			fx.Provide(rpc.NewGRPCServer),
 			fx.Provide(dkg.NewDKGServer),
+			fx.Invoke(http_server.NewEchoServer),
 			fx.Invoke(func(*grpc.Server) {}),
-			fx.Invoke(func(*http.Server) {}),
+			//fx.Invoke(func(*http.Server) {}),
 			fx.Invoke(func(*dkg.Node) {}),
 		)
 

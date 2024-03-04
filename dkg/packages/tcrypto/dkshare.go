@@ -18,6 +18,7 @@ import (
 	"go.dedis.ch/kyber/v3"
 	"io"
 
+	//kyber2 "github.com/drand/kyber"
 	"go.dedis.ch/kyber/v3/share"
 	"go.dedis.ch/kyber/v3/sign/bdn"
 	"go.dedis.ch/kyber/v3/sign/dss"
