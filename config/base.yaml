@@ -1,5 +1,0 @@
-application:
-  peeringURL: 0.0.0.0:4001
-  port: 4001
-  grpcAddr: :9091
-  httpAddr: :8081
