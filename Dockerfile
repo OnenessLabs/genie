@@ -14,7 +14,7 @@ COPY go.sum /genie/
 RUN cd /genie && go mod download
 
 ADD ethereum /genie
-RUN cd /genie/ethereum && go run build/ci.go install -static ./cmd/geth
+RUN cd /genie && go run build/ci.go install -static ./cmd/geth
 
 # Pull Geth into a second stage deploy alpine container
 FROM alpine:latest
